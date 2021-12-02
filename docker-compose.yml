@@ -1,0 +1,56 @@
+#wersja
+version: "3"
+#serwisy
+services:
+   #obraz z dockerhub
+  nginx:
+    build:
+      context: ./nginx
+    #mapowanie portu
+    ports: 
+      - 6666:80
+    #wolumen
+    volumes:
+      - ./files:/files
+    #podlaczenie do sieci
+    networks:
+      - frontend
+      - backend
+  #php
+  php: 
+    #obraz z dockerhub
+    image: php:8-fpm
+    #wolumeny
+    volumes:
+      - ./files:/files
+    networks:
+      - backend
+  #baza danych   
+  mysql: 
+    image: mysql:latest
+    #ustawienia hasla dla roota
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+    #wolumen
+    volumes:
+      - ./db:/var/lib/mysql
+    #sieci
+    networks:
+      - backend
+  #phpmyadmin 
+  phpmyadmin:
+    #obraz z dockerhub
+    image: phpmyadmin/phpmyadmin:latest
+    #polaczenie z baza
+    links:
+      - 'mysql:db'
+    #mapowanie portow
+    ports:
+      - 6001:80
+    #sieci
+    networks:
+      - backend
+#utworzenie sieci    
+networks:
+    frontend:
+    backend:
